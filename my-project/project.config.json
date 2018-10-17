@@ -1,0 +1,13 @@
+{
+  "description": "dabaishop",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "postcss": false,
+    "minified": false
+  },
+  "compileType": "miniprogram",
+  "appid": "wx93f11c7db8f9c757",
+  "projectname": "dabaishop-wepy",
+  "miniprogramRoot": "./dist"
+}

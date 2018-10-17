@@ -1,0 +1,13 @@
+<style>
+</style>
+
+<template lang="wxml">
+  
+</template>
+
+<script>
+import wepy from "wepy"
+export default class extends wepy.page {
+  
+}
+</script>

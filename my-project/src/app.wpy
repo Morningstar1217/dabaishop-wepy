@@ -1,0 +1,30 @@
+<style lang="css">
+.container {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+</style>
+
+<script>
+import wepy from 'wepy'
+import 'wepy-async-function'
+
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/index'
+    ],
+    window: {
+      backgroundTextStyle: 'light',
+      navigationBarBackgroundColor: '#fff',
+      navigationBarTitleText: '大白找券',
+      navigationBarTextStyle: 'black',
+      onReachBottomDistance: 50
+    }
+  }
+
+  globalData = {
+  }
+}
+</script>
