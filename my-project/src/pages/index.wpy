@@ -1,13 +1,395 @@
 <style>
+/* ********************** 商品分类***********************/
+.section {
+  margin-top: 10rpx;
+  background: #fff;
+  width: 100%;
+}
+
+.menuWrap {
+  position: relative;
+  width: 100%;
+  height: 100rpx;
+  line-height: 100rpx;
+  z-index: 10;
+}
+
+.menuList {
+  position: absolute;
+  top: 50%;
+  margin-top: -50rpx;
+  display: inline-block;
+  width: 90%;
+  height: 100rpx;
+  box-sizing: border-box;
+  line-height: 100rpx;
+  padding-left: 20rpx;
+  font-size: 28rpx;
+  background: #fff;
+  overflow: hidden;
+  white-space: nowrap;
+  box-shadow: none;
+}
+
+.menuListOpen {
+  display: inline-block;
+  box-sizing: border-box;
+  line-height: 100rpx;
+  padding-left: 20rpx;
+  font-size: 28rpx;
+  background: #fff;
+  width: 100%;
+  height: auto;
+  overflow: auto;
+  white-space: normal;
+  box-shadow: 0rpx 2rpx 2rpx rgba(0, 0, 0, 0.2);
+}
+
+.menuDetail {
+  display: inline-block;
+  width: 80rpx;
+  height: 100rpx;
+  box-sizing: border-box;
+  text-align: center;
+  margin-right: 16rpx;
+}
+
+.selected {
+  border-bottom: 4rpx solid #d34353;
+}
+
+.showAll {
+  position: absolute;
+  display: inline-block;
+  width: 30rpx;
+  height: 30rpx;
+  top: 25rpx;
+  right: 20rpx;
+  padding: 10rpx;
+}
+
+.showAlled {
+  background-image: url('http://pbn1t9k4c.bkt.clouddn.com/alled.png');
+}
+/* banner */
+.banner {
+  width: 100%;
+  height: 394rpx;
+}
+
+swiper-item {
+  background-size: 100%;
+}
+/* 广告 */
+.section .ad {
+  width: 100%;
+  vertical-align: top;
+}
+/* banner */
+.banner {
+  width: 100%;
+  height: 394rpx;
+}
+
+swiper-item {
+  background-size: 100%;
+}
+/* 广告 */
+.section .ad {
+  width: 100%;
+  vertical-align: top;
+}
 </style>
 
 <template lang="wxml">
-  
+  <view class="container">
+    <header :shopId.sync='shopId' @childChangeShop.user="changeShop"></header>
+    <!-- 分类 -->
+    <view class="section">
+        <view class="menuWrap">
+            <scroll-view scroll-x="true" class="menuList" wx:if="{{menuFlag}}">
+                <repeat for="{{menu}}">
+                    <view class="menuDetail {{count==item.id?'selected':''}}"  @tap="changeMenu({{item.id}},{{item.name}})">
+                        {{item.name}}
+                    </view>
+                </repeat>
+            </scroll-view>
+            <view class="menuListOpen" wx:else>
+                <repeat for="{{menu}}">
+                    <view class="menuDetail {{count==item.id?'selected':''}}" @tap="changeMenu({{item.id}},{{item.name}})">
+                        {{item.name}}
+                    </view>
+                </repeat>
+            </view>
+            <image class="showAll" @tap="openMenu" src="../images/showall.png"></image>
+        </view>
+    </view>
+    <!-- 轮播图区域 -->
+    <swiper indicator-dots="true" autoplay="true" interval="5000" duration="500" class="banner" indicator-color="#fff" indicator-active-color="#d34353">
+        <repeat for="{{imgUrls}}">
+            <swiper-item style="background-image:url('{{item}}')"></swiper-item>
+        </repeat>
+    </swiper>
+     <!-- 广告 -->
+    <view class="section">
+        <image src="/images/ad.png" class="ad" mode="widthFix" />
+    </view>
+    <!-- 商品列表 -->
+    <view class="section">
+      <!-- 条件筛选 -->
+        <filter :shopId.sync="shopId" :filterCount.sync="filterCount" @childChangeFilter.user="changeFilter"></filter>
+        <!-- 精选商品展示模板 -->
+        <view class="featuredWrap">
+            <repeat for="{{Goods}}">
+                <featuredComList :shopId.sync='shopId' :favPage.sync="favPage" :item="item" @childSetCol.user='setCol'></featuredComList>
+            </repeat>
+            <view class="noGoods" wx:if="{{nogoods}}" style="background-image: url('http://pbn1t9k4c.bkt.clouddn.com/nogods.png');"></view>
+            <!-- 返回顶部 -->
+            <totop :showTop.sync='showTop' @childTotop.user = 'totop'></totop>
+        </view>
+    </view>
+  </view>
 </template>
 
 <script>
-import wepy from "wepy"
+import wepy from 'wepy'
+import Header from '../components/header'
+import Totop from '../components/totop'
+import Filter from '../components/filter'
+import FeaturedComList from '../components/featureComList'
+import SearchPddGoods from '../mixins/searchPddGoods'
+import SearchJdGoods from '../mixins/searchJdGoods'
+import Tosat from '../mixins/toast'
+import PageScroll from '../mixins/pageScroll'
+
 export default class extends wepy.page {
-  
+  data = {
+    menu: [
+      {
+        id: 0,
+        name: '全部'
+      },
+      {
+        id: 1,
+        name: '服装'
+      },
+      {
+        id: 2,
+        name: '母婴'
+      },
+      {
+        id: 3,
+        name: '女装'
+      },
+      {
+        id: 4,
+        name: '内衣'
+      },
+      {
+        id: 5,
+        name: '手机'
+      },
+      {
+        id: 6,
+        name: '电器'
+      },
+      {
+        id: 7,
+        name: '家纺'
+      },
+      {
+        id: 8,
+        name: '运动'
+      },
+      {
+        id: 9,
+        name: '居家'
+      }
+    ],
+    imgUrls: [
+      'http://pbn1t9k4c.bkt.clouddn.com/banner1.jpg',
+      'http://pbn1t9k4c.bkt.clouddn.com/banner2.jpg',
+      'http://pbn1t9k4c.bkt.clouddn.com/banner3.jpg',
+      'http://pbn1t9k4c.bkt.clouddn.com/banner4.jpg'
+    ],
+    shopId: '0',
+    count: 0,
+    menuFlag: true,
+    filterCount: '0',
+    nogoods: false,
+    currentPage: 1,
+    showTop: '0',
+    Goods: [],
+    titleMsg: '',
+    sureBuy: false,
+    copysuccess: false,
+    footprint: [],
+    page_size: 50,
+    favPage: '0',
+    keyword: '全部',
+    pingtai: ''
+  }
+
+  methods = {
+    changeShop(value) {
+      this.showLoading()
+      this.currentPage = 1
+      this.Goods = []
+      if (value === '0') {
+        this.shopId = '0'
+        if (this.count === 0) {
+          this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getGoodsList)
+        } else {
+          this.searchPddGoods()
+        }
+      } else {
+        this.shopId = '1'
+        if (this.count === 0) {
+          this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getJdList)
+        } else {
+          this.searchJdGoods()
+        }
+      }
+    },
+    changeMenu(value, keyword) {
+      this.currentPage = 1
+      this.Goods = []
+      this.showLoading()
+      this.menuFlag = true
+      this.count = value
+      this.keyword = keyword
+      if (this.shopId === '0') {
+        if (this.count === 0) {
+          this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getGoodsList)
+        } else {
+          this.searchPddGoods()
+        }
+      } else {
+        if (this.count === 0) {
+          this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getJdList)
+        } else {
+          this.searchJdGoods()
+        }
+      }
+    },
+    openMenu() {
+      this.menuFlag = !this.menuFlag
+    },
+    changeFilter(value) {
+      this.showLoading()
+      this.currentPage = 1
+      this.Goods = []
+      this.filterCount = value
+      if (this.shopId === '0') {
+        if (this.count === 0) {
+          this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getGoodsList)
+        } else {
+          this.searchPddGoods()
+        }
+      }
+    },
+    setCol(sku, title, couponLink, marketprice, price, pic) {
+      const url = this.$parent.globalData.host + this.$parent.globalData.setFavorite
+      const unionid = wepy.getStorageSync('unionid')
+      if (this.shopId === '0') {
+        this.pingtai = 'pdd'
+      } else {
+        this.pingtai = 'jd'
+      }
+      wepy
+        .request({
+          url: url,
+          data: {
+            unionid: unionid,
+            sku: sku,
+            title: title,
+            couponLink: couponLink,
+            market_price: marketprice,
+            price: price,
+            pic: pic,
+            pingtai: this.pingtai
+          }
+        })
+        .then(res => {
+          if (res.data.code === 1) {
+            this.setColSuccess()
+          }
+        })
+    },
+    totop() {
+      this.pageScrollTo()
+    }
+  }
+
+  onLoad() {
+    this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getGoodsList)
+  }
+
+  getAllGoods(url) {
+    wepy
+      .request({
+        url: url,
+        data: {
+          page: this.currentPage,
+          type: this.filterCount,
+          page_size: this.page_size
+        }
+      })
+      .then(res => {
+        const arr1 = this.Goods
+        const arr2 = res.data.data.list
+        arr1.push.apply(arr1, arr2)
+        this.Goods = arr1
+        this.currentPage++
+        this.$apply()
+        wepy.hideLoading()
+      })
+  }
+
+  onReachBottom() {
+    this.showLoading()
+    if (this.shopId === '0') {
+      if (this.count === 0) {
+        this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getGoodsList)
+      } else {
+        this.searchPddGoods()
+      }
+    } else {
+      if (this.count === 0) {
+        this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getJdList)
+      } else {
+        this.searchJdGoods()
+      }
+    }
+  }
+
+  onPageScroll(e) {
+    if (e.scrollTop >= 500) {
+      this.showTop = '1'
+      this.$apply()
+    } else {
+      this.showTop = '0'
+      this.$apply()
+    }
+  }
+
+  onShareAppMessage() {
+    return {
+      title: this.$parent.globalData.shareProfile,
+      path: this.$parent.globalData.sharePath,
+      imageUrl: this.$parent.globalData.shareImg,
+      success: function(res) {},
+      fail: function(res) {}
+    }
+  }
+
+  components = {
+    header: Header,
+    featuredComList: FeaturedComList,
+    totop: Totop,
+    filter: Filter
+  }
+
+  mixins = [SearchPddGoods, SearchJdGoods, Tosat, PageScroll]
 }
 </script>

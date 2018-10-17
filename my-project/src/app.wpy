@@ -3,6 +3,7 @@
   height: 100%;
   width: 100%;
   overflow: hidden;
+  background: #f2f2f2;
 }
 </style>
 
@@ -12,19 +13,79 @@ import 'wepy-async-function'
 
 export default class extends wepy.app {
   config = {
-    pages: [
-      'pages/index'
-    ],
+    pages: ['pages/index', 'pages/start', 'pages/main', 'pages/quan'],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
       navigationBarTitleText: '大白找券',
       navigationBarTextStyle: 'black',
       onReachBottomDistance: 50
+    },
+    tabBar: {
+      color: '#707070',
+      selectedColor: '#d34353',
+      backgroundColor: '#ffffff',
+      borderStyle: 'black',
+      list: [
+        {
+          pagePath: 'pages/index',
+          text: '首页',
+          iconPath: '/images/icon/index (2).png',
+          selectedIconPath: '/images/icon/index (1).png'
+        },
+        {
+          pagePath: 'pages/quan',
+          text: '搜索',
+          iconPath: '/images/icon/quan (2).png',
+          selectedIconPath: '/images/icon/quan (1).png'
+        },
+        {
+          pagePath: 'pages/main',
+          text: '我的',
+          iconPath: '/images/icon/main (2).png',
+          selectedIconPath: '/images/icon/main (1).png'
+        }
+      ]
     }
   }
 
   globalData = {
+    userInfo: null,
+    host: 'https://www.97youmeitao.com/',
+    getJdList: 'api.php/quan.jd/getJdList',
+    searchJdGood: 'api.php/quan.jd/searchJdGood',
+    getJdCoupon: 'api.php/quan.jd/getJdCoupon',
+    getGoodsList: 'api.php/quan.pddapi/getGoodsList',
+    searchGoods: 'api.php/quan.pddapi/searchGoods',
+    goodsPromotionUrl: 'api.php/quan.pddapi/goodsPromotionUrl',
+    setFavorite: 'api.php/small.user/addfavorites',
+    getFavorites: 'api.php/small.user/getfavoriteslist',
+    delFavorite: 'api.php/small.user/delfavoriteslist',
+    shareProfile: '一个不允许你不省钱的小程序',
+    shareImg: 'http://pbn1t9k4c.bkt.clouddn.com/tbshareImg.jpg',
+    sharePathL: 'pages/index',
+    shareImg:'http://pbn1t9k4c.bkt.clouddn.com/DbshopShare.jpg'
+  }
+
+  onLaunch() {
+    let userInfo = wepy.getStorageSync('userInfo')
+    if (!userInfo) {
+      this.goLoginPageTimeOut()
+      // return
+    }
+  }
+
+  goLoginPageTimeOut() {
+    setTimeout(function() {
+      wepy.navigateTo({
+        url: '/pages/start'
+      })
+    }, 1000)
+  }
+
+  constructor() {
+    super()
+    this.use('promisify')
   }
 }
 </script>

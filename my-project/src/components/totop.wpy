@@ -1,0 +1,35 @@
+<style>
+.toTop {
+  position: fixed;
+  right: 40rpx;
+  top: 50%;
+  margin-top: -40rpx;
+  width: 80rpx;
+  height: 80rpx;
+  line-height: 60rpx;
+  text-align: center;
+  color: #fff;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+}
+</style>
+
+<template lang="wxml">
+  <view class="toTop" @tap="toTop" wx:if="{{showTop==='1'}}">︿</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class extends wepy.component {
+  props = {
+    showTop: String
+  }
+
+  methods = {
+    toTop() {
+      this.$emit('childTotop')
+    }
+  }
+}
+</script>
+

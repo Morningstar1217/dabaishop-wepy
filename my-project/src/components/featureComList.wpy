@@ -1,0 +1,241 @@
+<style>
+/* ************************精选商品*********************** */
+.featuredWrap {
+  position: relative;
+  width: 100%;
+  background: #fff;
+}
+
+.featuredCom {
+  box-sizing: border-box;
+  display: flex;
+  position: relative;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+  padding: 20rpx 20rpx;
+  border-top: 1px solid #eee;
+}
+
+.consoleCom {
+  position: absolute;
+  top: 80rpx;
+  left: 10rpx;
+  width: 90rpx;
+  height: 160rpx;
+  line-height: 160rpx;
+  text-align: center;
+  transition: 0.2s;
+}
+
+.consoleCom icon {
+  width: 100%;
+  height: 100%;
+}
+
+.featuredImg {
+  position: relative;
+  width: 240rpx;
+  transition: 0.2s;
+  margin-top: 10rpx;
+}
+
+.featuredImg > .comImg {
+  width: 240rpx;
+  height: 240rpx;
+}
+
+.featuredImg > .integral {
+  position: absolute;
+  right: 12rpx;
+  top: 0;
+  width: 34rpx;
+  height: 43rpx;
+}
+
+.score {
+  position: absolute;
+  top: 12rpx;
+  right: 22rpx;
+  font-size: 18rpx;
+  color: #fff;
+}
+
+.featuredComDetail {
+  width: 420rpx;
+  margin-left: 20rpx;
+  transition: 0.2s;
+}
+
+.consoleIng {
+  transform: translateX(90rpx);
+}
+
+.featuredName {
+  height: 80rpx;
+  line-height: 40rpx;
+  overflow: hidden;
+  font-size: 26rpx;
+  margin-bottom: 15rpx;
+  margin-top: 10rpx;
+}
+
+.shopImgJd,
+.shopImgPdd {
+  height: 30rpx;
+  vertical-align: middle;
+  margin-top: -5rpx;
+}
+
+.shopImgJd {
+  width: 60rpx;
+}
+
+.shopImgPdd {
+  width: 100rpx;
+}
+
+.goHongWrap {
+  font-size: 24rpx;
+  color: #818181;
+}
+
+.goHongWrap view {
+  display: inline-block;
+}
+
+.hadBuy {
+  margin-left: 22%;
+}
+
+.priceWrap {
+  margin-bottom: 25rpx;
+}
+
+.priceShow {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.priceShow view {
+  display: inline-block;
+}
+
+.priceNow {
+  font-weight: bold;
+  font-size: 30rpx;
+  color: #d34353;
+}
+
+.priceAgo {
+  margin-left: 10rpx;
+  font-size: 24rpx;
+  text-decoration: line-through;
+  color: #666;
+}
+
+.coupon {
+  width: 100rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  font-size: 22rpx;
+  text-align: center;
+  color: #fff;
+  margin-top: 20rpx;
+  background-image: url('http://pbn1t9k4c.bkt.clouddn.com/couponBg.png');
+  background-repeat: no-repeat;
+  background-size: 100rpx 40rpx;
+}
+
+.favPage {
+  position: absolute;
+  right: 180rpx;
+  bottom: 50rpx;
+  width: 48rpx;
+  height: 40rpx;
+  overflow: hidden;
+}
+
+.tobuyBtn {
+  position: absolute;
+  right: 28rpx;
+  bottom: 45rpx;
+  width: 118rpx;
+  height: 48rpx;
+  padding: 0 5rpx;
+  line-height: 50rpx;
+  color: #ff4e66;
+  text-align: center;
+  font-size: 24rpx;
+  border: 1px solid #ff4e66;
+  border-radius: 4rpx;
+}
+</style>
+
+<template lang="wxml">
+    <view class="featuredCom">
+        <view class="consoleCom" wx:if="{{consolePlat}}" index="index">
+            <icon wx:if="{{item.selected}}" type="success" color="red" @tap.stop="change(index)" />
+            <icon wx:else type="circle" @tap.stop="change(index)"  />
+        </view>
+        <view class="featuredImg {{consolePlat?'consoleIng':''}}">
+            <image src="{{item.pic}}" class="comImg" />
+            <text class="score">{{item.score}}</text>
+        </view>
+        <view class="featuredComDetail {{consolePlat?'consoleIng':''}}">
+            <view class="featuredName">
+                <view wx:if="{{favPage==='0'}}">
+                    <image src="../images/pdd.png" class="shopImgPdd" wx:if="{{shopId==='0'}}" />
+                    <image src="../images/jd.png" class="shopImgJd" wx:else />
+                    {{item.title}}
+                </view>
+                <view wx:else>
+                    <image src="/images/jd.png" class="shopImgJd" wx:if="{{item.pingtai=='jd'}}" />
+                    <image src="/images/pdd.png" class="shopImgPdd" wx:else />
+                    {{item.title}}
+                </view>
+            </view>
+            <view class="priceShow">
+                <view class="priceWrap">
+                    <view class="priceNow">￥{{item.price}}</view>
+                    <view class="priceAgo">￥{{item.market_price}}</view>
+                </view>
+                <view class="coupon">{{filter.toInt(item.market_price-item.price)}}元券</view>
+            </view>
+        </view>
+        <image src="/images/favpage1.png" wx:if="{{favPage==='0'}}" class="favPage" @tap.stop="setCol({{item.sku}},{{item.title}},{{item.couponLink}},{{item.market_price}},{{item.price}},{{item.pic}})" />
+        <view class="tobuyBtn" @tap="goBuy({{item.sku}},{{item.couponLink}},{{item.pingtai}},{{item.title}},{{item.market_price}},{{item.price}},{{item.pic}})">
+            立即领券
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import Filter from '../wxs/filter.wxs'
+
+export default class extends wepy.component {
+  props = {
+    shopId: String,
+    favPage: String,
+    consolePlat: String
+  }
+
+  methods = {
+    setCol(sku, title, couponLink, marketprice, price, pic) {
+      this.$emit('childSetCol', sku, title, couponLink, marketprice, price, pic)
+    },
+    change(value) {
+      this.$emit('childChange', value)
+    },
+    goBuy(sku, couponLink, pingtai, title, marketprice, price, pic) {
+      this.$emit('childGoBuy', sku, couponLink, pingtai, title, marketprice, price, pic)
+    }
+  }
+
+  wxs = {
+    filter: Filter
+  }
+}
+</script>

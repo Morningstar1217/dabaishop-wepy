@@ -1,0 +1,63 @@
+<style>
+/* 商品筛选 */
+.filter {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+  height: 80rpx;
+  line-height: 58rpx;
+  padding: 10rpx 20rpx;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.filterList {
+  position: relative;
+  width: 33.33%;
+  text-align: center;
+  font-size: 30rpx;
+}
+
+.filterListed {
+  color: #ff4e66;
+}
+
+.title {
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  font-size: 32rpx;
+}
+</style>
+
+<template lang="wxml">
+  <view class="filter" wx:if="{{shopId=='0'}}">
+       <view class="filterList {{filterCount==='0'?'filterListed':''}}"  @tap="changeFilter(0)">
+           精选
+       </view>
+       <view class="filterList {{filterCount==='1'?'filterListed':''}}"  @tap="changeFilter(1)">
+           销量
+       </view>
+       <view class="filterList {{filterCount==='2'?'filterListed':''}}"  @tap="changeFilter(2)">
+           券金额
+       </view>
+   </view>
+  <view class="title" wx:else>精选商品</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class extends wepy.component {
+  props = {
+    shopId: String,
+    filterCount: String
+  }
+
+  methods = {
+    changeFilter(value) {
+      this.$emit('childChangeFilter', value)
+    }
+  }
+}
+</script>
