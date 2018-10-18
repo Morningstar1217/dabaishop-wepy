@@ -1,11 +1,11 @@
 <style>
-/* 顶部搜索 */
 .header {
   position: relative;
   box-sizing: border-box;
   width: 100%;
   padding: 52rpx 40rpx 8rpx;
   background: #fff;
+  border-bottom: 1px solid #f2f2f2;
 }
 
 .searchWrap {
@@ -22,18 +22,18 @@
 
 .search {
   box-sizing: border-box;
+  width: 600rpx;
   height: 70rpx;
   line-height: 70rpx;
-  width: 100%;
   font-size: 24rpx;
   border: solid 6rpx #ff4e66;
-  border-radius: 35rpx;
   padding-left: 60rpx;
   background-image: url('http://pbn1t9k4c.bkt.clouddn.com/search.png');
   background-repeat: no-repeat;
   background-size: 35rpx;
   background-origin: content-box;
   background-position: -40rpx;
+  border-radius: 35rpx 0 0 35rpx;
 }
 
 .searchBtn {
@@ -68,30 +68,30 @@
 </style>
 
 <template lang="wxml">
-  <!-- 搜索栏 -->
+  <view class="container">
+    <!-- 顶部搜索 -->
     <view class="header">
-        <view class="goods {{shopId=='0'?'seleted':''}}" @tap="changeShop('0')">拼多多</view>
-        <view class="jd {{shopId=='1'?'seleted':''}}" @tap="changeShop('1')">京东</view>
+        <view class="goods {{shopId==0?'seleted':''}}" @tap="changeShop" id="0">拼多多</view>
+        <view class="jd {{shopId==1?'seleted':''}}" @tap="changeShop" id="1">京东</view>
         <view class="searchWrap">
-            <input class="search" placeholder="输入关键词或粘贴拼多多/京东商品名称" @tap="toSearch" />
+            <input class="search" placeholder="输入关键词或粘贴拼多多/京东商品名称" auto-focus="true" confirm-type="search" bindinput="remSearch" @confirm="goSearch" />
+            <view class="searchBtn" @tap="goSearch">搜索</view>
         </view>
     </view>
+  </view>
 </template>
 
 <script>
 import wepy from 'wepy'
-export default class extends wepy.component {
-  props = {
-    shopId: String
+export default class extends wepy.page {
+  data = {
+    shopId: ''
   }
 
-  methods = {
-    changeShop(value) {
-      this.$emit('childChangeShop', value)
-    },
-    toSearch() {
-      this.$emit('childToSearch')
-    }
+  onLoad(options) {
+    console.log(options)
+    this.shopId = options.shopId
+    this.$apply()
   }
 }
 </script>

@@ -13,7 +13,7 @@ import 'wepy-async-function'
 
 export default class extends wepy.app {
   config = {
-    pages: ['pages/index', 'pages/start', 'pages/main', 'pages/quan'],
+    pages: ['pages/index', 'pages/search', 'pages/favorite', 'pages/main', 'pages/start', 'pages/quan', 'pages/poster'],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
@@ -35,7 +35,7 @@ export default class extends wepy.app {
         },
         {
           pagePath: 'pages/quan',
-          text: '搜索',
+          text: '找券',
           iconPath: '/images/icon/quan (2).png',
           selectedIconPath: '/images/icon/quan (1).png'
         },
@@ -61,10 +61,9 @@ export default class extends wepy.app {
     setFavorite: 'api.php/small.user/addfavorites',
     getFavorites: 'api.php/small.user/getfavoriteslist',
     delFavorite: 'api.php/small.user/delfavoriteslist',
-    shareProfile: '一个不允许你不省钱的小程序',
-    shareImg: 'http://pbn1t9k4c.bkt.clouddn.com/tbshareImg.jpg',
+    shareProfile: '购物不领券\n白花冤枉钱',
     sharePathL: 'pages/index',
-    shareImg:'http://pbn1t9k4c.bkt.clouddn.com/DbshopShare.jpg'
+    shareImg: 'http://pbn1t9k4c.bkt.clouddn.com/DbshopShare.jpg'
   }
 
   onLaunch() {

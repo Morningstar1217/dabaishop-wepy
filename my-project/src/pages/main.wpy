@@ -1,0 +1,186 @@
+<style>
+/* pages/main/main.wxss */
+.header {
+  position: relative;
+  text-align: center;
+  width: 100%;
+  height: 360rpx;
+  background-image: url('http://pbn1t9k4c.bkt.clouddn.com/userBg.png');
+  background-size: 750rpx;
+}
+
+.userImg {
+  display: inline-block;
+  width: 188rpx;
+  height: 188rpx;
+  border-radius: 50%;
+  border: 6rpx solid #dd4b5d;
+}
+
+.userName {
+  font-size: 34rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  margin-top: 20rpx;
+  color: #fff;
+}
+
+/* 我的工具 */
+
+.toolsTitle {
+  width: 100%;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-indent: 2em;
+  font-size: 28rpx;
+  background: #fff;
+  border-bottom: 2rpx solid #f2f2f2;
+}
+
+.toolsWrap {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  background: #fff;
+}
+
+.toolList {
+  position: relative;
+  box-sizing: border-box;
+  width: 33.33%;
+  padding: 40rpx 30rpx;
+  overflow: hidden;
+  text-align: center;
+  font-size: 28rpx;
+  border-left: 1rpx solid #f2f2f2;
+  border-bottom: 1rpx solid #f2f2f2;
+}
+
+.shareBtn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  border-radius: 0;
+  outline: none;
+  opacity: 0;
+}
+
+.toolImg {
+  width: 80rpx;
+  height: 80rpx;
+  vertical-align: middle;
+}
+
+.toolName {
+  height: 50rpx;
+  line-height: 50rpx;
+}
+
+.navigator-hover {
+  background: #fff;
+}
+
+.share-image {
+  position: fixed;
+  left: 50%;
+  top: 40rpx;
+  margin-left: -325rpx;
+  width: 650rpx;
+}
+
+.bigWrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+</style>
+
+<template lang="wxml">
+<view class="container">
+    <!-- 顶部 -->
+    <view class="header">
+        <image class="userImg" src="{{userInfo.avatarUrl}}" />
+        <view class="userName">{{userInfo.nickName}}</view>
+    </view>
+    <!-- 底部工具 -->
+    <view class="tools">
+        <view class="toolsTitle">我的工具</view>
+        <!-- 我的工具 -->
+        <view class="toolsWrap">
+            <block wx:for="{{tools}}" wx:key="id">
+                <navigator class="toolList" url="{{item.url}}" hover-class="navigator-hover">
+                    <image src="{{item.pic}}" class="toolImg" />
+                    <view class="toolName">{{item.name}}</view>
+                </navigator>
+            </block>
+            <view class="toolList">
+                <button class="shareBtn" open-type="share">分享</button>
+                <image src="/images/share.png" class="toolImg" />
+                <view class="toolName">分享给好友</view>
+            </view>
+        </view>
+    </view>
+</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class extends wepy.page {
+  data = {
+    userInfo: [],
+    tools: [
+      {
+        name: '我的收藏',
+        pic: '/images/fav.png',
+        url: '/pages/favorite'
+      },
+      {
+        name: '我的足迹',
+        pic: '/images/history.png',
+        url: '/pages/history'
+      },
+      {
+        name: '新用户免单',
+        pic: '/images/free.png',
+        url: '/pages/poster?id=0'
+      },
+      {
+        name: '查券教程',
+        pic: '/images/search.png',
+        url: '/pages/poster?id=1'
+      },
+      {
+        name: '联系客服',
+        pic: '/images/message.png',
+        url: '/pages/poster?id=2'
+      }
+    ]
+  }
+  config = {
+    navigationBarBackgroundColor: '#f6233b',
+    navigationBarTextStyle: '#fff'
+  }
+  onShow(options) {
+    this.userInfo = wepy.getStorageSync('userInfo')
+    this.$apply()
+  }
+  onShareAppMessage() {
+    return {
+      title: this.$parent.globalData.shareProfile,
+      path: this.$parent.globalData.sharePath,
+      imageUrl: this.$parent.globalData.shareImg,
+      success: function(res) {},
+      fail: function(res) {}
+    }
+  }
+}
+</script>

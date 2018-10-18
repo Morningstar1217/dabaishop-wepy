@@ -103,7 +103,7 @@ swiper-item {
 
 <template lang="wxml">
   <view class="container">
-    <header :shopId.sync='shopId' @childChangeShop.user="changeShop"></header>
+    <header :shopId.sync='shopId' @childChangeShop.user="changeShop" @childToSearch.user='toSearch'></header>
     <!-- 分类 -->
     <view class="section">
         <view class="menuWrap">
@@ -159,7 +159,7 @@ import Filter from '../components/filter'
 import FeaturedComList from '../components/featureComList'
 import SearchPddGoods from '../mixins/searchPddGoods'
 import SearchJdGoods from '../mixins/searchJdGoods'
-import Tosat from '../mixins/toast'
+import Toast from '../mixins/toast'
 import PageScroll from '../mixins/pageScroll'
 
 export default class extends wepy.page {
@@ -318,6 +318,11 @@ export default class extends wepy.page {
     },
     totop() {
       this.pageScrollTo()
+    },
+    toSearch() {
+      wepy.navigateTo({
+        url: 'search?shopId=' + this.shopId
+      })
     }
   }
 
@@ -390,6 +395,6 @@ export default class extends wepy.page {
     filter: Filter
   }
 
-  mixins = [SearchPddGoods, SearchJdGoods, Tosat, PageScroll]
+  mixins = [SearchPddGoods, SearchJdGoods, Toast, PageScroll]
 }
 </script>

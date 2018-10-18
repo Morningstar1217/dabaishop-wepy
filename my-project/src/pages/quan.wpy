@@ -1,0 +1,42 @@
+<style>
+.headerBg {
+  position: relative;
+  text-align: center;
+  width: 100%;
+  height: 360rpx;
+  background-image: url('http://pbn1t9k4c.bkt.clouddn.com/searchBg.png');
+  background-size: 750rpx;
+}
+</style>
+
+<template lang="wxml">
+  <view class="container">
+    <!-- 顶部 -->
+    <view class="headerBg"></view>
+    <header @childChangeShop.user = 'changeShop' :shopId.sync="shopId"></header>
+</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import Header from '../components/header'
+export default class extends wepy.page {
+  data = {
+    shopId: '0'
+  }
+
+  methods = {
+    changeShop(value) {
+      if (value === '0') {
+        this.shopId = '0'
+      } else {
+        this.shopId = '1'
+      }
+    }
+  }
+
+  components = {
+    header: Header
+  }
+}
+</script>

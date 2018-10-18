@@ -1,0 +1,255 @@
+<style>
+.favTitle {
+  position: relative;
+  width: 100%;
+  height: 80rpx;
+  line-height: 80rpx;
+  overflow: hidden;
+  background: #fff;
+}
+
+.favSearch {
+  position: absolute;
+  top: 50%;
+  left: 40rpx;
+  margin-top: -30rpx;
+  width: 500rpx;
+  height: 60rpx;
+  padding-right: 50rpx;
+  line-height: 60rpx;
+  text-indent: 0.5em;
+  border-radius: 30rpx;
+  padding-left: 30rpx;
+  font-size: 28rpx;
+  background-color: #f2f2f2;
+  background-image: url('http://pbn1t9k4c.bkt.clouddn.com/search.png');
+  background-size: 40rpx;
+  background-position: 530rpx;
+  background-repeat: no-repeat;
+}
+
+.conso {
+  float: right;
+  width: 120rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.consoed {
+  color: #e33d45;
+}
+
+/* *******************商品编辑************************* */
+
+.consolePlatform {
+  box-sizing: border-box;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 28rpx;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.3);
+  transition: 0.5s;
+}
+
+.selectedAll {
+  width: 160rpx;
+  height: 80rpx;
+  background: rgb(16, 172, 25);
+  text-align: center;
+}
+
+.selectedAll > icon {
+  margin-top: 16rpx;
+  vertical-align: top;
+}
+
+.delComs {
+  width: 160rpx;
+  text-align: center;
+  background: #e33d45;
+}
+
+.noComs {
+  text-align: center;
+  height: 100rpx;
+  padding: 50rpx 0;
+  line-height: 100rpx;
+  font-size: 40rpx;
+}
+</style>
+
+<template lang="wxml">
+  <view class="container">
+      <!-- 标题 -->
+    <view class="favTitle">
+      <input class="favSearch" @input="remSearch" @confirm="toSearch" placeholder="搜索收藏的产品" />
+      <view class="conso {{consolePlat==='1'&&Goods.length!=0?'consoed':''}}" @tap="filterManager">
+        {{consolePlat==='1'&&Goods.length!=0?'完成':'编辑'}}
+      </view>
+    </view>
+    <!-- 精选商品展示模板 -->
+      <view class="featuredWrap">
+            <repeat for="{{Goods}}">
+                <featuredComList :pingtai.sync='shopId' :favPage.sync="favPage" :item="item" :consolePlat='consolePlat' @childChange.user="change" :index="index"></featuredComList>
+            </repeat>
+            <view class="noGoods" wx:if="{{Goods.length===0}}" style="background-image: url('http://pbn1t9k4c.bkt.clouddn.com/nofavs.png');"></view>
+            <!-- 返回顶部 -->
+            <totop :showTop.sync='showTop' @childTotop.user = 'totop'></totop>
+      </view>
+
+      <!-- 商品编辑 -->
+    <view class="consolePlatform" wx:if="{{consolePlat==='1'&&Goods.length!=0}}">
+      <view class="selectedAll" bind:tap="selectAll">全选</view>
+      <view class="delComs" bind:tap="deleteList">删除</view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import FeaturedComList from '../components/featureComList'
+import Totop from '../components/totop'
+import PageScroll from '../mixins/pageScroll'
+
+export default class extends wepy.page {
+  data = {
+    Goods: [],
+    pingtai: '',
+    favPage: '1',
+    showTop: '0',
+    consolePlat: '0',
+    selectAllStatus: false,
+    keyword: '',
+    favs: []
+  }
+
+  onLoad() {
+    this.getFav()
+  }
+
+  getFav() {
+    const url = this.$parent.globalData.host + this.$parent.globalData.getFavorites
+    const unionid = wepy.getStorageSync('unionid')
+    wepy
+      .request({
+        url: url,
+        data: {
+          unionid: unionid,
+          page_size: 100
+        }
+      })
+      .then(res => {
+        if (res.data.code === -1) {
+          this.Goods = []
+        } else {
+          const Goods = res.data.data
+          Goods.reverse()
+          this.Goods = Goods
+          this.favs = Goods
+          this.$apply()
+        }
+      })
+  }
+
+  onPageScroll(e) {
+    if (e.scrollTop >= 500) {
+      this.showTop = '1'
+      this.$apply()
+    } else {
+      this.showTop = '0'
+      this.$apply()
+    }
+  }
+
+  delFavorite(sku, pingtai) {
+    const unionid = wepy.getStorageSync('unionid')
+    const url = this.$parent.globalData.host + this.$parent.globalData.delFavorite
+    wepy.request({
+      url: url,
+      data: {
+        unionid: unionid,
+        sku: sku,
+        pingtai: pingtai
+      },
+      header: {
+        'Content-Type': 'application/json'
+      }
+    })
+  }
+
+  remSearch(e) {
+    this.keyword = e.detail.value
+  }
+
+  toSearch() {
+    var favs = this.favs
+    const keyword = this.keyword
+    this.consolePlat = '0'
+    if (!keyword) {
+      this.getFav()
+    } else {
+      var arr2 = []
+      favs.forEach(ele => {
+        if (ele.title.match(keyword)) {
+          arr2.unshift(ele)
+        }
+      })
+      this.Goods = arr2
+    }
+  }
+
+  methods = {
+    filterManager() {
+      this.consolePlat = this.consolePlat === '0' ? '1' : '0'
+    },
+    totop() {
+      this.pageScrollTo()
+    },
+    change(val) {
+      const index = val
+      let goods = this.Goods
+      const selected = goods[index].selected
+      goods[index].selected = !selected
+      this.Goods = goods
+    },
+    selectAll(e) {
+      let selectAllStatus = this.selectAllStatus
+      selectAllStatus = !selectAllStatus
+      let goods = this.Goods
+
+      for (let i = 0; i < goods.length; i++) {
+        goods[i].selected = selectAllStatus
+      }
+      this.selectAllStatus = selectAllStatus
+      this.Goods = goods
+    },
+    deleteList(e) {
+      let goods = this.Goods
+      let arr2 = []
+      for (let i = 0; i < goods.length; i++) {
+        if (!goods[i].selected) {
+          arr2.push(goods[i])
+        } else {
+          this.delFavorite(goods[i].sku, goods[i].pingtai)
+        }
+        this.Goods = arr2
+      }
+    }
+  }
+
+  components = {
+    featuredComList: FeaturedComList,
+    totop: Totop
+  }
+
+  mixins = [PageScroll]
+}
+</script>

@@ -1,0 +1,56 @@
+<style>
+.freePoster {
+  width: 100%;
+  height: 100%;
+  background-color: rgb(255, 73, 82);
+
+  background-size: 100%;
+  background-repeat: no-repeat;
+}
+
+.title {
+  height: 120rpx;
+  line-height: 120rpx;
+  text-align: center;
+  font-size: 30rpx;
+  color: #333;
+}
+</style>
+
+<template lang="wxml">
+  <view class="container">
+    <view class="title">{{title}}</view>
+    <view class="freePoster" style="height:{{imgHei}}px;background-image: url('{{imgUrl}}');" @tap="save"></view>
+</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class extends wepy.page {
+  data = {
+    imgHei: '',
+    title: '',
+    imgUrl: ''
+  }
+
+  save() {
+    wepy.previewImage({
+      urls: [this.imgUrl]
+    })
+  }
+
+  onLoad(options) {
+    wepy.getSystemInfo().then(res => (this.imgHei = res.windowHeight - 60))
+    if (options.id === '0') {
+      this.title = '新用户免单'
+      this.imgUrl = 'http://pbn1t9k4c.bkt.clouddn.com/freePoster.png'
+    } else if (options.id === '1') {
+      this.title = '查券教程'
+      this.imgUrl = 'http://pbn1t9k4c.bkt.clouddn.com/freePoster.png'
+    } else {
+      this.title = '联系客服'
+      this.imgUrl = 'http://pbn1t9k4c.bkt.clouddn.com/conKe.png'
+    }
+  }
+}
+</script>
