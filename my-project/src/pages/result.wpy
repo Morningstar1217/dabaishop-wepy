@@ -127,12 +127,12 @@ export default class extends wepy.page {
     this.goSearch()
   }
 
-  onShow() {
-    let userInfo = wepy.getStorageSync('userInfo')
-    if (!userInfo) {
-      this.$parent.goLoginPageTimeOut()
-    }
-  }
+  // onShow() {
+  //   let userInfo = wepy.getStorageSync('userInfo')
+  //   if (!userInfo) {
+  //     this.$parent.goLoginPageTimeOut()
+  //   }
+  // }
 
   goSearch() {
     var historys = wepy.getStorageSync('historys')
