@@ -103,7 +103,7 @@ swiper-item {
 
 <template lang="wxml">
   <view class="container">
-    <header :shopId.sync='shopId' @childChangeShop.user="changeShop" @childToSearch.user='toSearch'></header>
+    <header :shopId.sync='shopId' @childChangeShop.user="changeShop" @childToSearch.user="toSearch"></header>
     <!-- 分类 -->
     <view class="section">
         <view class="menuWrap">
@@ -141,7 +141,7 @@ swiper-item {
         <!-- 精选商品展示模板 -->
         <view class="featuredWrap">
             <repeat for="{{Goods}}">
-                <featuredComList :shopId.sync='shopId' :favPage.sync="favPage" :item="item" @childSetCol.user='setCol'></featuredComList>
+                <featuredComList :shopId.sync='shopId' :favPage.sync="favPage" :item="item" @childSetCol.user='setCol' @childGoBuy.user='goBuy'></featuredComList>
             </repeat>
             <view class="noGoods" wx:if="{{nogoods}}" style="background-image: url('http://pbn1t9k4c.bkt.clouddn.com/nogods.png');"></view>
             <!-- 返回顶部 -->
@@ -161,6 +161,8 @@ import SearchPddGoods from '../mixins/searchPddGoods'
 import SearchJdGoods from '../mixins/searchJdGoods'
 import Toast from '../mixins/toast'
 import PageScroll from '../mixins/pageScroll'
+import SetCol from '../mixins/setCol.js'
+import Gobuy from '../mixins/gobuy.js'
 
 export default class extends wepy.page {
   data = {
@@ -226,50 +228,45 @@ export default class extends wepy.page {
     footprint: [],
     page_size: 50,
     favPage: '0',
-    keyword: '全部',
-    pingtai: ''
+    keyword: '',
+    pingtai: '',
+    footerFlag: '0'
   }
 
   methods = {
     changeShop(value) {
       this.showLoading()
       this.currentPage = 1
-      this.Goods = []
       if (value === '0') {
         this.shopId = '0'
         if (this.count === 0) {
-          this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getGoodsList)
-        } else {
-          this.searchPddGoods()
+          this.keyword = ''
         }
+        this.searchPddGoods()
       } else {
         this.shopId = '1'
         if (this.count === 0) {
-          this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getJdList)
-        } else {
-          this.searchJdGoods()
+          this.keyword = ''
         }
+        this.searchJdGoods()
       }
     },
     changeMenu(value, keyword) {
       this.currentPage = 1
-      this.Goods = []
       this.showLoading()
       this.menuFlag = true
       this.count = value
       this.keyword = keyword
       if (this.shopId === '0') {
         if (this.count === 0) {
-          this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getGoodsList)
-        } else {
-          this.searchPddGoods()
+          this.keyword = ''
         }
+        this.searchPddGoods()
       } else {
         if (this.count === 0) {
-          this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getJdList)
-        } else {
-          this.searchJdGoods()
+          this.keyword = ''
         }
+        this.searchJdGoods()
       }
     },
     openMenu() {
@@ -278,43 +275,15 @@ export default class extends wepy.page {
     changeFilter(value) {
       this.showLoading()
       this.currentPage = 1
-      this.Goods = []
       this.filterCount = value
-      if (this.shopId === '0') {
-        if (this.count === 0) {
-          this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getGoodsList)
-        } else {
-          this.searchPddGoods()
-        }
+      if (this.count === 0) {
+        this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getGoodsList)
+      } else {
+        this.searchPddGoods()
       }
     },
     setCol(sku, title, couponLink, marketprice, price, pic) {
-      const url = this.$parent.globalData.host + this.$parent.globalData.setFavorite
-      const unionid = wepy.getStorageSync('unionid')
-      if (this.shopId === '0') {
-        this.pingtai = 'pdd'
-      } else {
-        this.pingtai = 'jd'
-      }
-      wepy
-        .request({
-          url: url,
-          data: {
-            unionid: unionid,
-            sku: sku,
-            title: title,
-            couponLink: couponLink,
-            market_price: marketprice,
-            price: price,
-            pic: pic,
-            pingtai: this.pingtai
-          }
-        })
-        .then(res => {
-          if (res.data.code === 1) {
-            this.setColSuccess()
-          }
-        })
+      this.setCol(sku, title, couponLink, marketprice, price, pic)
     },
     totop() {
       this.pageScrollTo()
@@ -323,48 +292,28 @@ export default class extends wepy.page {
       wepy.navigateTo({
         url: 'search?shopId=' + this.shopId
       })
+    },
+    goBuy(sku, couponLink, title, marketprice, price, pic, pingtai) {
+      this.goBuy(sku, couponLink, title, marketprice, price, pic, pingtai)
     }
   }
 
   onLoad() {
-    this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getGoodsList)
-  }
-
-  getAllGoods(url) {
-    wepy
-      .request({
-        url: url,
-        data: {
-          page: this.currentPage,
-          type: this.filterCount,
-          page_size: this.page_size
-        }
-      })
-      .then(res => {
-        const arr1 = this.Goods
-        const arr2 = res.data.data.list
-        arr1.push.apply(arr1, arr2)
-        this.Goods = arr1
-        this.currentPage++
-        this.$apply()
-        wepy.hideLoading()
-      })
+    this.searchPddGoods()
   }
 
   onReachBottom() {
     this.showLoading()
     if (this.shopId === '0') {
       if (this.count === 0) {
-        this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getGoodsList)
-      } else {
-        this.searchPddGoods()
+        this.keyword = ''
       }
+      this.searchMorePddGoods()
     } else {
       if (this.count === 0) {
-        this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getJdList)
-      } else {
-        this.searchJdGoods()
+        this.keyword = ''
       }
+      this.searchMoreJdGoods()
     }
   }
 
@@ -395,6 +344,6 @@ export default class extends wepy.page {
     filter: Filter
   }
 
-  mixins = [SearchPddGoods, SearchJdGoods, Toast, PageScroll]
+  mixins = [SearchPddGoods, SearchJdGoods, Toast, PageScroll, SetCol, Gobuy]
 }
 </script>

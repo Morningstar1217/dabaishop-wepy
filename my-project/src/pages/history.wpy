@@ -6,6 +6,8 @@
   line-height: 80rpx;
   overflow: hidden;
   background: #fff;
+  text-align: center;
+  font-size: 34rpx;
 }
 
 .favSearch {
@@ -86,21 +88,20 @@
 }
 </style>
 
-<template lang="wxml">
+<template lang='wxml'>
   <view class="container">
-      <!-- 标题 -->
+     <!-- 标题 -->
     <view class="favTitle">
-      <input class="favSearch" @input="remSearch" @confirm="toSearch" placeholder="搜索收藏的产品" />
-      <view class="conso {{consolePlat==='1'&&Goods.length!=0?'consoed':''}}" @tap="filterManager">
+        <view class="conso {{consolePlat==='1'&&Goods.length!=0?'consoed':''}}" @tap="filterManager">
         {{consolePlat==='1'&&Goods.length!=0?'完成':'编辑'}}
       </view>
     </view>
     <!-- 精选商品展示模板 -->
       <view class="featuredWrap">
             <repeat for="{{Goods}}">
-                <featuredComList :pingtai.sync='shopId' :favPage.sync="favPage" :item="item" :consolePlat='consolePlat' @childChange.user="change" :index="index" @childGoBuy.user="goBuy"></featuredComList>
+                <featuredComList :pingtai.sync='shopId' :favPage.sync="favPage" :item="item" :consolePlat='consolePlat' @childChange.user="change" :index="index"></featuredComList>
             </repeat>
-            <view class="noGoods" wx:if="{{Goods.length===0}}" style="background-image: url('http://pbn1t9k4c.bkt.clouddn.com/nofavs.png');"></view>
+            <view class="noGoods" wx:if="{{Goods.length===0}}" style="background-image: url('http://pbn1t9k4c.bkt.clouddn.com/nofoot.png');"></view>
             <!-- 返回顶部 -->
             <totop :showTop.sync='showTop' @childTotop.user = 'totop'></totop>
       </view>
@@ -118,8 +119,6 @@ import wepy from 'wepy'
 import FeaturedComList from '../components/featureComList'
 import Totop from '../components/totop'
 import PageScroll from '../mixins/pageScroll'
-import GoBuy from '../mixins/gobuy.js'
-
 export default class extends wepy.page {
   data = {
     Goods: [],
@@ -127,37 +126,19 @@ export default class extends wepy.page {
     favPage: '1',
     showTop: '0',
     consolePlat: '0',
-    selectAllStatus: false,
-    keyword: '',
-    favs: []
+    selectAllStatus: false
   }
 
-  onLoad() {
-    this.getFav()
+  onShow() {
+    this.getFoot()
   }
 
-  getFav() {
-    const url = this.$parent.globalData.host + this.$parent.globalData.getFavorites
-    const unionid = wepy.getStorageSync('unionid')
-    wepy
-      .request({
-        url: url,
-        data: {
-          unionid: unionid,
-          page_size: 100
-        }
-      })
-      .then(res => {
-        if (res.data.code === -1) {
-          this.Goods = []
-        } else {
-          const Goods = res.data.data
-          Goods.reverse()
-          this.Goods = Goods
-          this.favs = Goods
-          this.$apply()
-        }
-      })
+  getFoot() {
+    this.Goods = wepy.getStorageSync('footprint')
+    if (!this.Goods) {
+      this.Goods = []
+    }
+    this.$apply()
   }
 
   onPageScroll(e) {
@@ -167,43 +148,6 @@ export default class extends wepy.page {
     } else {
       this.showTop = '0'
       this.$apply()
-    }
-  }
-
-  delFavorite(sku, pingtai) {
-    const unionid = wepy.getStorageSync('unionid')
-    const url = this.$parent.globalData.host + this.$parent.globalData.delFavorite
-    wepy.request({
-      url: url,
-      data: {
-        unionid: unionid,
-        sku: sku,
-        pingtai: pingtai
-      },
-      header: {
-        'Content-Type': 'application/json'
-      }
-    })
-  }
-
-  remSearch(e) {
-    this.keyword = e.detail.value
-  }
-
-  toSearch() {
-    var favs = this.favs
-    const keyword = this.keyword
-    this.consolePlat = '0'
-    if (!keyword) {
-      this.getFav()
-    } else {
-      var arr2 = []
-      favs.forEach(ele => {
-        if (ele.title.match(keyword)) {
-          arr2.unshift(ele)
-        }
-      })
-      this.Goods = arr2
     }
   }
 
@@ -238,14 +182,13 @@ export default class extends wepy.page {
       for (let i = 0; i < goods.length; i++) {
         if (!goods[i].selected) {
           arr2.push(goods[i])
-        } else {
-          this.delFavorite(goods[i].sku, goods[i].pingtai)
         }
         this.Goods = arr2
       }
-    },
-    goBuy(sku, couponLink, title, marketprice, price, pic, pingtai) {
-      this.goBuy(sku, couponLink, title, marketprice, price, pic, pingtai)
+      wepy.setStorage({
+        key: 'footprint',
+        data: arr2
+      })
     }
   }
 
@@ -254,6 +197,6 @@ export default class extends wepy.page {
     totop: Totop
   }
 
-  mixins = [PageScroll, GoBuy]
+  mixins = [PageScroll]
 }
 </script>

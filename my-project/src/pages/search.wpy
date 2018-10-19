@@ -65,17 +65,154 @@
   color: #fff;
   border-radius: 15rpx 15rpx 0 0;
 }
+
+/* 热门搜索 */
+.hotSearchWrap {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10rpx;
+  background: #fff;
+}
+
+.hotTitle,
+.historyTitle {
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  height: 80rpx;
+  padding: 10rpx 20rpx;
+  line-height: 60rpx;
+  font-size: 30rpx;
+  overflow: hidden;
+}
+
+.hotTitle > image {
+  width: 38rpx;
+  height: 40rpx;
+  vertical-align: middle;
+  margin-top: -10rpx;
+  margin-right: 10rpx;
+}
+
+.hotSearch {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 10rpx 20rpx;
+  font-size: 28rpx;
+}
+
+.hotSearchList {
+  /* width: 100rpx; */
+  margin: 10rpx 20rpx 10rpx 0;
+  padding: 10rpx 15rpx;
+  text-align: center;
+  border: 1rpx solid #bfbfbf;
+  border-radius: 10rpx;
+}
+/* 搜索历史 */
+.searchHistoryWrap {
+  width: 100%;
+  margin-top: 10rpx;
+  background: #fff;
+}
+.historyTitle {
+  border-bottom: 1rpx solid #f2f2f2;
+}
+
+.historyTitle > image {
+  width: 40rpx;
+  height: 40rpx;
+  vertical-align: middle;
+}
+.clearAll {
+  float: right;
+  font-size: 26rpx;
+}
+/* 历史列表 */
+.historyWrap {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.historyList {
+  box-sizing: border-box;
+  width: 100%;
+  height: 80rpx;
+  line-height: 80rpx;
+  padding-left: 80rpx;
+  font-size: 28rpx;
+  color: #999;
+  overflow: hidden;
+  border-bottom: 1rpx solid #f2f2f2;
+}
+
+.hitoryName {
+  display: inline-block;
+  width: 400rpx;
+  overflow: hidden;
+  white-space: normal;
+  text-overflow: ellipsis;
+}
+
+.delete {
+  float: right;
+  width: 100rpx;
+  text-align: center;
+}
+
+.noHistory {
+  height: 50rpx;
+  line-height: 50rpx;
+  font-size: 28rpx;
+  text-align: center;
+  color: #999;
+}
 </style>
 
 <template lang="wxml">
   <view class="container">
     <!-- 顶部搜索 -->
     <view class="header">
-        <view class="goods {{shopId==0?'seleted':''}}" @tap="changeShop" id="0">拼多多</view>
-        <view class="jd {{shopId==1?'seleted':''}}" @tap="changeShop" id="1">京东</view>
+        <view class="goods {{shopId=='0'?'seleted':''}}" @tap="changeShop(0)">拼多多</view>
+        <view class="jd {{shopId=='1'?'seleted':''}}" @tap="changeShop(1)">京东</view>
         <view class="searchWrap">
             <input class="search" placeholder="输入关键词或粘贴拼多多/京东商品名称" auto-focus="true" confirm-type="search" bindinput="remSearch" @confirm="goSearch" />
             <view class="searchBtn" @tap="goSearch">搜索</view>
+        </view>
+    </view>
+    <!-- 热门搜索 -->
+    <view class="hotSearchWrap">
+        <view class="hotTitle">
+            <image src="/images/hotSearch.png" />
+            热门搜索
+        </view>
+        <view class="hotSearch">
+            <repeat for="{{menu}}" key="id">
+                <view class="hotSearchList" @tap="goHotSearch({{item.name}})" id="{{item.id}}">
+                    {{item.name}}
+                </view>
+            </repeat>
+        </view>
+    </view>
+    <!-- 搜索历史 -->
+    <view class="searchHistoryWrap">
+        <view class="historyTitle">
+            <image src="/images/historySearch.png" />
+            搜索历史
+            <view class="clearAll" @tap="deleteAll">清空</view>
+        </view>
+        <!-- 搜索历史列表 -->
+        <view class="historyWrap">
+            <repeat for="{{historys}}" key="id" index="index">
+                <view class="historyList" data-index="{{index}}" @tap="goHotSearch({{item}})">
+                    <view class="hitoryName">{{item}}</view>
+                    <view class="delete" catch:tap="delete({{index}})" data-index="{{index}}">x</view>
+                </view>
+            </repeat>
+            <view class="noHistory" wx:if="{{historys.length==0}}">暂时没有记录</view>
         </view>
     </view>
   </view>
@@ -85,13 +222,110 @@
 import wepy from 'wepy'
 export default class extends wepy.page {
   data = {
-    shopId: ''
+    shopId: '0',
+    menu: [
+      {
+        id: 0,
+        name: '服装'
+      },
+      {
+        id: 1,
+        name: '电暖气'
+      },
+      {
+        id: 2,
+        name: '心机上衣女'
+      },
+      {
+        id: 3,
+        name: '男装'
+      },
+      {
+        id: 4,
+        name: '秋新款'
+      },
+      {
+        id: 5,
+        name: '手机'
+      },
+      {
+        id: 6,
+        name: '电器'
+      },
+      {
+        id: 7,
+        name: '手机壳'
+      }
+    ],
+    historys: [],
+    searchValue: ''
   }
 
   onLoad(options) {
-    console.log(options)
     this.shopId = options.shopId
     this.$apply()
+  }
+
+  onShow() {
+    if (!wepy.getStorageSync('historys')) {
+      this.historys = []
+    } else {
+      const historys = wepy.getStorageSync('historys')
+      this.historys = historys
+    }
+  }
+  methods = {
+    changeShop(num) {
+      if (num === '0') {
+        this.shopId = '0'
+      } else {
+        this.shopId = '1'
+      }
+    },
+    remSearch(e) {
+      this.searchValue = e.detail.value
+    },
+    goHotSearch(val) {
+      this.searchValue = val
+      this.goSearch()
+    },
+    delete(index) {
+      const historys = this.historys
+      historys.splice(index, 1)
+      this.historys = historys
+      wepy.setStorage({
+        key: 'historys',
+        data: historys
+      })
+    },
+    deleteAll() {
+      wepy
+        .showModal({
+          title: '大白提示',
+          content: '确定清空吗?'
+        })
+        .then(res => {
+          if (res.confirm) {
+            var historys = this.historys
+            historys.splice(0)
+            this.historys = historys
+            this.$apply()
+            wepy.setStorage({
+              key: 'historys',
+              data: historys
+            })
+          }
+        })
+    }
+  }
+  goSearch() {
+    var keyword = this.searchValue
+    if (keyword.length === 0) {
+      keyword = this.menu[0].name
+    }
+    wepy.navigateTo({
+      url: '/pages/result?keyword=' + keyword + '&shopId=' + this.shopId
+    })
   }
 }
 </script>

@@ -1,0 +1,228 @@
+<style>
+.container {
+  background: #fff;
+}
+.header {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 52rpx 40rpx 8rpx;
+  background: #fff;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.searchWrap {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+  height: 70rpx;
+  line-height: 70rpx;
+  border-radius: 31px;
+  overflow: hidden;
+}
+
+.search {
+  box-sizing: border-box;
+  width: 600rpx;
+  height: 70rpx;
+  line-height: 70rpx;
+  font-size: 24rpx;
+  border: solid 6rpx #ff4e66;
+  padding-left: 60rpx;
+  background-image: url('http://pbn1t9k4c.bkt.clouddn.com/search.png');
+  background-repeat: no-repeat;
+  background-size: 35rpx;
+  background-origin: content-box;
+  background-position: -40rpx;
+  border-radius: 35rpx 0 0 35rpx;
+}
+
+.searchBtn {
+  width: 18%;
+  background: #ff4e66;
+  color: #fff;
+  text-align: center;
+  font-size: 28rpx;
+}
+
+.goods,
+.jd {
+  position: absolute;
+  bottom: 73rpx;
+  left: 70rpx;
+  width: 120rpx;
+  height: 50rpx;
+  line-height: 50rpx;
+  font-size: 28rpx;
+  text-align: center;
+}
+
+.jd {
+  left: 190rpx;
+}
+
+.seleted {
+  background: #ff4e66;
+  color: #fff;
+  border-radius: 15rpx 15rpx 0 0;
+}
+</style>
+
+<template lang="wxml">
+  <view class="container">
+    <!-- 顶部搜索 -->
+    <view class="header">
+        <view class="goods {{shopId=='0'?'seleted':''}}" @tap="changeShop(0)">拼多多</view>
+        <view class="jd {{shopId=='1'?'seleted':''}}" @tap="changeShop(1)">京东</view>
+        <view class="searchWrap">
+            <input class="search" placeholder="输入关键词或粘贴拼多多/京东商品名称" confirm-type="search" @input="remSearch" @confirm="goSearch" value="{{keyword}}"/>
+            <view class="searchBtn" @tap="goSearch">搜索</view>
+        </view>
+    </view>
+    <filter :shopId.sync="shopId" :filterCount.sync="filterCount" @childChangeFilter.user="changeFilter"></filter>
+    <!-- 精选商品展示模板 -->
+      <view class="featuredWrap">
+            <repeat for="{{Goods}}">
+                <featuredComList :shopId.sync='shopId' :favPage.sync="favPage" :item="item" @childSetCol.user='setCol' @childGoBuy.user='goBuy'></featuredComList>
+            </repeat>
+            <view class="noGoods" wx:if="{{Goods.length===0}}" style="background-image: url('http://pbn1t9k4c.bkt.clouddn.com/nogods.png');"></view>
+            <!-- 返回顶部 -->
+            <totop :showTop.sync='showTop' @childTotop.user = 'totop'></totop>
+      </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import Filter from '../components/filter'
+import FeaturedComList from '../components/featureComList'
+import Totop from '../components/totop'
+import PageScroll from '../mixins/pageScroll'
+import SearchJdGoods from '../mixins/searchJdGoods.js'
+import SearchPddGoods from '../mixins/searchPddGoods.js'
+import Toast from '../mixins/toast'
+import SetCol from '../mixins/setCol.js'
+import GoBuy from '../mixins/gobuy.js'
+
+export default class extends wepy.page {
+  data = {
+    currentPage: 1,
+    showTop: false,
+    shopId: '0',
+    keyword: '',
+    historys: [],
+    filterCount: '0',
+    Goods: ['1'],
+    page_size: 50,
+    favPage: '0'
+  }
+
+  onLoad(options) {
+    console.log(options)
+    this.shopId = options.shopId
+    this.keyword = options.keyword
+    this.$apply()
+    this.goSearch()
+  }
+
+  onShow() {
+    let userInfo = wepy.getStorageSync('userInfo')
+    if (!userInfo) {
+      this.$parent.goLoginPageTimeOut()
+    }
+  }
+
+  goSearch() {
+    var historys = wepy.getStorageSync('historys')
+    if (!historys) {
+      historys = []
+    }
+    historys.unshift(this.keyword)
+    this.historys = historys
+    wepy.setStorage({
+      key: 'historys',
+      data: historys
+    })
+    // this.Goods = []
+    this.currentPage = 1
+    if (this.shopId === '0') {
+      this.searchPddGoods()
+    } else {
+      this.searchJdGoods()
+    }
+  }
+
+  onReachBottom() {
+    this.showLoading()
+    if (this.shopId === '0') {
+      this.searchMorePddGoods()
+    } else {
+      this.searchMoreJdGoods()
+    }
+  }
+
+  onPageScroll(e) {
+    if (e.scrollTop >= 500) {
+      this.showTop = '1'
+      this.$apply()
+    } else {
+      this.showTop = '0'
+      this.$apply()
+    }
+  }
+
+  onShareAppMessage() {
+    return {
+      title: this.$parent.globalData.shareProfile,
+      path: 'pages/result?shopId=' + this.shopId + '&keyword=' + this.keyword,
+      imageUrl: this.$parent.globalData.shareImg,
+      success: function(res) {},
+      fail: function(res) {}
+    }
+  }
+
+  methods = {
+    remSearch(e) {
+      this.keyword = e.detail.value
+    },
+    changeFilter(value) {
+      this.showLoading()
+      this.currentPage = 1
+      // this.Goods = []
+      this.filterCount = value
+      this.searchPddGoods()
+    },
+    changeShop(value) {
+      this.showLoading()
+      this.currentPage = 1
+      // this.Goods = []
+      if (value === '0') {
+        this.shopId = '0'
+        this.searchPddGoods()
+      } else {
+        this.shopId = '1'
+        this.searchJdGoods()
+      }
+    },
+    totop() {
+      this.pageScrollTo()
+    },
+    setCol(sku, title, couponLink, marketprice, price, pic) {
+      this.setCol(sku, title, couponLink, marketprice, price, pic)
+    },
+    goBuy(sku, couponLink, title, marketprice, price, pic, pingtai) {
+      this.goBuy(sku, couponLink, title, marketprice, price, pic, pingtai)
+    }
+  }
+
+  components = {
+    filter: Filter,
+    featuredComList: FeaturedComList,
+    totop: Totop
+  }
+
+  mixins = [Toast, SearchJdGoods, SearchPddGoods, PageScroll, SetCol, GoBuy]
+}
+</script>

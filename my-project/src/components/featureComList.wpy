@@ -212,7 +212,7 @@
             </view>
         </view>
         <image src="/images/favpage1.png" wx:if="{{favPage==='0'}}" class="favPage" @tap.stop="setCol({{item.sku}},{{item.title}},{{item.couponLink}},{{item.market_price}},{{item.price}},{{item.pic}})" />
-        <view class="tobuyBtn" @tap="goBuy({{item.sku}},{{item.couponLink}},{{item.pingtai}},{{item.title}},{{item.market_price}},{{item.price}},{{item.pic}})">
+        <view class="tobuyBtn" @tap="goBuy({{item.sku}},{{item.couponLink}},{{item.title}},{{item.market_price}},{{item.price}},{{item.pic}},{{item.pingtai}})">
             立即领券
         </view>
     </view>
@@ -237,8 +237,8 @@ export default class extends wepy.component {
     change(value) {
       this.$emit('childChange', value)
     },
-    goBuy(sku, couponLink, pingtai, title, marketprice, price, pic) {
-      this.$emit('childGoBuy', sku, couponLink, pingtai, title, marketprice, price, pic)
+    goBuy(sku, couponLink, title, marketprice, price, pic, pingtai) {
+      this.$emit('childGoBuy', sku, couponLink, title, marketprice, price, pic, pingtai)
     }
   }
 

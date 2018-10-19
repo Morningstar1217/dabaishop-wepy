@@ -13,7 +13,17 @@ import 'wepy-async-function'
 
 export default class extends wepy.app {
   config = {
-    pages: ['pages/index', 'pages/search', 'pages/favorite', 'pages/main', 'pages/start', 'pages/quan', 'pages/poster'],
+    pages: [
+      'pages/index',
+      'pages/main',
+      'pages/history',
+      'pages/search',
+      'pages/result',
+      'pages/favorite',
+      'pages/start',
+      'pages/quan',
+      'pages/poster'
+    ],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
