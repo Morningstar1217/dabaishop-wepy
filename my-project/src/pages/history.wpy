@@ -99,7 +99,7 @@
     <!-- 精选商品展示模板 -->
       <view class="featuredWrap">
             <repeat for="{{Goods}}">
-                <featuredComList :pingtai.sync='shopId' :favPage.sync="favPage" :item="item" :consolePlat='consolePlat' @childChange.user="change" :index="index"></featuredComList>
+                <featuredComList :pingtai.sync='shopId' :favPage.sync="favPage" :item="item" :consolePlat='consolePlat' @childChange.user="change" :index="index" @childMoveCom.user='moveCom' @childMoveStart.user="moveStart" :moved="moved" @childDeleteList.user="deleteCom" :moveInx.sync='moveInx'></featuredComList>
             </repeat>
             <view class="noGoods" wx:if="{{Goods.length===0}}" style="background-image: url('http://pbn1t9k4c.bkt.clouddn.com/nofoot.png');"></view>
             <!-- 返回顶部 -->
@@ -126,7 +126,10 @@ export default class extends wepy.page {
     favPage: '1',
     showTop: '0',
     consolePlat: '0',
-    selectAllStatus: false
+    selectAllStatus: false,
+    startPageX: 0,
+    moved: '0',
+    moveInx: '0'
   }
 
   onShow() {
@@ -188,6 +191,29 @@ export default class extends wepy.page {
       wepy.setStorage({
         key: 'footprint',
         data: arr2
+      })
+    },
+    moveCom(e) {
+      if (e.touches[0].pageX - this.startPageX > 0) {
+        this.moved = '0'
+      } else {
+        this.moved = '1'
+      }
+    },
+    moveStart(index, e) {
+      this.startPageX = e.touches[0].pageX
+      this.moveInx = index
+      this.$apply()
+    },
+    deleteCom(index) {
+      console.log(index)
+      let goods = this.Goods
+      goods.splice(index, 1)
+      this.Goods = goods
+      this.moved = '0'
+      wepy.setStorage({
+        key: 'footprint',
+        data: goods
       })
     }
   }

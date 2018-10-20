@@ -98,7 +98,7 @@
     <!-- 精选商品展示模板 -->
       <view class="featuredWrap">
             <repeat for="{{Goods}}">
-                <featuredComList :pingtai.sync='shopId' :favPage.sync="favPage" :item="item" :consolePlat='consolePlat' @childChange.user="change" :index="index" @childGoBuy.user="goBuy"></featuredComList>
+                <featuredComList :pingtai.sync='shopId' :favPage.sync="favPage" :item="item" :consolePlat='consolePlat' @childChange.user="change" :index="index" @childGoBuy.user="goBuy" @childMoveCom.user='moveCom' @childMoveStart.user="moveStart" :moved="moved" @childDeleteList.user="deleteCom" :moveInx.sync='moveInx'></featuredComList>
             </repeat>
             <view class="noGoods" wx:if="{{Goods.length===0}}" style="background-image: url('http://pbn1t9k4c.bkt.clouddn.com/nofavs.png');"></view>
             <!-- 返回顶部 -->
@@ -107,8 +107,8 @@
 
       <!-- 商品编辑 -->
     <view class="consolePlatform" wx:if="{{consolePlat==='1'&&Goods.length!=0}}">
-      <view class="selectedAll" bind:tap="selectAll">全选</view>
-      <view class="delComs" bind:tap="deleteList">删除</view>
+      <view class="selectedAll" @tap="selectAll">全选</view>
+      <view class="delComs" @tap="deleteList">删除</view>
     </view>
   </view>
 </template>
@@ -129,7 +129,10 @@ export default class extends wepy.page {
     consolePlat: '0',
     selectAllStatus: false,
     keyword: '',
-    favs: []
+    favs: [],
+    startPageX: 0,
+    moved: '0',
+    moveInx: '0'
   }
 
   onLoad() {
@@ -246,6 +249,25 @@ export default class extends wepy.page {
     },
     goBuy(sku, couponLink, title, marketprice, price, pic, pingtai) {
       this.goBuy(sku, couponLink, title, marketprice, price, pic, pingtai)
+    },
+    moveCom(e) {
+      if (e.touches[0].pageX - this.startPageX > 0) {
+        this.moved = '0'
+      } else {
+        this.moved = '1'
+      }
+    },
+    moveStart(index, e) {
+      this.startPageX = e.touches[0].pageX
+      this.moveInx = index
+      this.$apply()
+    },
+    deleteCom(index) {
+      let goods = this.Goods
+      this.delFavorite(goods[index].sku, goods[index].pingtai)
+      goods.splice(index, 1)
+      this.Goods = goods
+      this.moved = '0'
     }
   }
 
