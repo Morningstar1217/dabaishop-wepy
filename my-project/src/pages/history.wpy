@@ -157,6 +157,8 @@ export default class extends wepy.page {
   methods = {
     filterManager() {
       this.consolePlat = this.consolePlat === '0' ? '1' : '0'
+      this.moved = '0'
+      this.$apply()
     },
     totop() {
       this.pageScrollTo()

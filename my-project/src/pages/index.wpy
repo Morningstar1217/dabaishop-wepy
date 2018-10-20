@@ -277,10 +277,9 @@ export default class extends wepy.page {
       this.currentPage = 1
       this.filterCount = value
       if (this.count === 0) {
-        this.getAllGoods(this.$parent.globalData.host + this.$parent.globalData.getGoodsList)
-      } else {
-        this.searchPddGoods()
+        this.keyword = ''
       }
+      this.searchPddGoods()
     },
     setCol(sku, title, couponLink, marketprice, price, pic) {
       this.setCol(sku, title, couponLink, marketprice, price, pic)
