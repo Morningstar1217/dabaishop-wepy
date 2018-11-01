@@ -13,11 +13,22 @@ export default class SearchJdGoods extends wepy.mixin {
         }
       })
       .then(res => {
-        this.currentPage++
-        this.Goods = res.data.data.list
+        if (res.data.code === -1 || res.data.data === '') {
+          console.log('fail')
+          this.Goods = []
+          this.$apply()
+        } else {
+          this.currentPage++
+          this.Goods = res.data.data.list
+          this.$apply()
+        }
+        // wepy.hideLoading()
+      }).catch(res => {
+        console.log('fail')
+        this.Goods = []
         this.$apply()
-        wepy.hideLoading()
       })
+    wepy.hideLoading()
   }
   searchMoreJdGoods() {
     const url = this.$parent.globalData.host + this.$parent.globalData.searchJdGood

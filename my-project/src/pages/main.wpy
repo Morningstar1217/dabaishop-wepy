@@ -116,12 +116,12 @@
         <view class="toolsTitle">我的工具</view>
         <!-- 我的工具 -->
         <view class="toolsWrap">
-            <block wx:for="{{tools}}" wx:key="id">
+            <repeat for="{{tools}}" key="id">
                 <navigator class="toolList" url="{{item.url}}" hover-class="navigator-hover">
                     <image src="{{item.pic}}" class="toolImg" />
                     <view class="toolName">{{item.name}}</view>
                 </navigator>
-            </block>
+            </repeat>
             <view class="toolList">
                 <button class="shareBtn" open-type="share">分享</button>
                 <image src="/images/share.png" class="toolImg" />
@@ -147,6 +147,11 @@ export default class extends wepy.page {
         name: '我的足迹',
         pic: '/images/history.png',
         url: '/pages/history'
+      },
+      {
+        name: '签到',
+        pic: '/images/history.png',
+        url: '/pages/sign'
       },
       {
         name: '新用户免单',

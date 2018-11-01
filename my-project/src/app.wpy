@@ -15,6 +15,7 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/index',
+      'pages/sign',
       'pages/favorite',
       'pages/main',
       'pages/history',
@@ -73,7 +74,9 @@ export default class extends wepy.app {
     delFavorite: 'api.php/small.user/delfavoriteslist',
     shareProfile: '购物不领券\n白花冤枉钱',
     sharePathL: 'pages/index',
-    shareImg: 'http://pbn1t9k4c.bkt.clouddn.com/DbshopShare.jpg'
+    shareImg: 'http://pbn1t9k4c.bkt.clouddn.com/DbshopShare.jpg',
+    getJdCateList: 'api.php/quan.jd/getCateList',
+    getPddCateList: 'api.php/quan.pddapi/getCateList'
   }
 
   onLaunch() {
