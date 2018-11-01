@@ -3,7 +3,7 @@ import wepy from 'wepy'
 export default class extends wepy.mixin {
   showLoading() {
     wepy.showLoading({
-      title: '拼命加载中...'
+      title: '大白查找中...'
     })
   }
   setColSuccess() {
