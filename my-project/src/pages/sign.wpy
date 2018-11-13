@@ -2,7 +2,7 @@
 </style>
 
 <template lang="wxml">
-
+    <navigator target="miniProgram" app-id="wx7fde10b292bd04bd">测试跳转</navigator>
 </template>
 
 <script>

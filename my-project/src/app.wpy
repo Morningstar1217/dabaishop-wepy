@@ -57,7 +57,8 @@ export default class extends wepy.app {
           selectedIconPath: '/images/icon/main (1).png'
         }
       ]
-    }
+    },
+    navigateToMiniProgramAppIdList: ['wx7fde10b292bd04bd']
   }
 
   globalData = {

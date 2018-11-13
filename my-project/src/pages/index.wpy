@@ -189,7 +189,7 @@ export default class extends wepy.page {
       },
       {
         id: 5,
-        name: '手机'
+        name: '饰品'
       },
       {
         id: 6,
