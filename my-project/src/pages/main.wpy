@@ -148,11 +148,11 @@ export default class extends wepy.page {
         pic: '/images/history.png',
         url: '/pages/history'
       },
-      // {
-      //   name: '签到',
-      //   pic: '/images/history.png',
-      //   url: '/pages/sign'
-      // },
+      {
+        name: '签到',
+        pic: '/images/history.png',
+        url: '/pages/sign'
+      },
       {
         name: '新用户免单',
         pic: '/images/free.png',
